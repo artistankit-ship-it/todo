@@ -212,17 +212,19 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .bigbtn:active:not(:disabled){opacity:.75;transform:scale(.98)}
 .bigbtn:disabled{background:var(--fill);color:var(--faint);cursor:default}
 .gsec > .bigbtn:first-child{margin-top:0}
-.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.tile{display:grid;grid-template-columns:1fr auto;grid-template-areas:"icon count" "name name";align-items:center;row-gap:8px;padding:10px 12px 10px 10px;border:0;border-radius:12px;background:var(--surface);color:var(--fg);text-align:left;font:inherit;cursor:pointer;transition:transform .35s cubic-bezier(.2,1.4,.4,1),box-shadow .2s}
-.tile.wide{grid-column:span 2;grid-template-columns:auto 1fr auto;grid-template-areas:"icon name count";column-gap:12px}
-.tile.wide .tname{color:var(--fg);font-size:17px;font-weight:600}
-.ticon{grid-area:icon;width:30px;height:30px;border-radius:50%;background:var(--qc);display:grid;place-items:center}
-.ticon svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.ticon svg.fill{fill:#fff;stroke:none}
-.tcount{grid-area:count;font-size:24px;font-weight:700;letter-spacing:.35px;font-variant-numeric:tabular-nums;line-height:1}
-.tname{grid-area:name;font-size:15px;font-weight:600;letter-spacing:-.24px;color:var(--muted)}
-.tile:active{opacity:.8}
-.tile.over{transform:scale(1.06);box-shadow:0 0 0 2.5px var(--qc),0 10px 26px var(--shadow)}
+.dockwrap{position:sticky;top:8px;z-index:20}
+@media (max-width:640px){.dockwrap{top:calc(env(safe-area-inset-top,0px) + 52px)}}
+.dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:12px 4px 10px;border-radius:18px;background:color-mix(in srgb,var(--surface) 86%,transparent);backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);box-shadow:0 0 0 .5px var(--line),0 6px 20px rgba(0,0,0,.06)}
+.dk{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;border:0;background:transparent;color:var(--fg);font:inherit;cursor:pointer;padding:0}
+.dki{position:relative;width:46px;height:46px;border-radius:15px;background:color-mix(in srgb,var(--qc) 16%,transparent);display:grid;place-items:center;transition:transform .32s cubic-bezier(.2,1.5,.4,1),background .2s}
+.dki svg{width:22px;height:22px;fill:none;stroke:var(--qc);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s,fill .2s}
+.dki svg.fill{fill:var(--qc);stroke:none}
+.dki b{position:absolute;top:-6px;right:-8px;min-width:19px;height:19px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:var(--qc);color:#fff;font-size:11px;font-weight:700;line-height:19px;text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--surface)}
+.dkl{font-size:11px;font-weight:500;letter-spacing:.07px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dk:active .dki{transform:scale(.92)}
+.dk.over .dki{transform:scale(1.2);background:var(--qc)}
+.dk.over .dki svg{stroke:#fff} .dk.over .dki svg.fill{fill:#fff}
+.dk.over .dkl{color:var(--fg)}
 .qs{--qc:#30b0c7}
 .zitems{position:relative}
 .ccard{position:relative;display:flex;align-items:flex-start;gap:8px;min-height:44px;box-sizing:border-box;padding:11px 10px 11px 16px;background:var(--surface);cursor:grab}
@@ -265,6 +267,36 @@ details.sd[open] summary::after{transform:rotate(45deg)}
 .ascancel{border-radius:14px;background:var(--elev);font-weight:600}
 .ascancel:active{background:var(--fill)}
 .adot{width:10px;height:10px;border-radius:50%;background:var(--qc)}
+
+/* ---- select mode ---- */
+.top{position:relative}
+.selbtn{position:absolute;top:2px;right:0;border:0;background:transparent;color:var(--accent);font:inherit;font-size:17px;letter-spacing:-.41px;padding:2px 4px;cursor:pointer}
+.navbar.show{pointer-events:auto}
+.navsel{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:0;height:44px;border:0;background:transparent;color:var(--accent);font:inherit;font-size:17px;letter-spacing:-.41px;cursor:pointer}
+@media (min-width:641px){.navsel{display:none}}
+.selbar{position:fixed;left:0;right:0;bottom:0;z-index:31;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px max(18px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+  background:var(--bar);backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);border-top:.5px solid var(--sep)}
+.selbar[hidden]{display:none}
+@media (min-width:641px){.selbar{left:50%;right:auto;bottom:20px;transform:translateX(-50%);width:440px;border-radius:14px;border:0;box-shadow:0 10px 30px var(--shadow),0 0 0 .5px var(--line);padding:10px 18px}}
+.selbar button{border:0;background:transparent;color:var(--accent);font:inherit;font-size:17px;letter-spacing:-.41px;padding:6px 0;cursor:pointer}
+.selbar button.danger{color:var(--q1)}
+.selbar button:disabled{color:var(--faint);cursor:default}
+.selbar button[hidden]{display:none}
+body.selecting .tabs{display:none}
+body.selecting .grip,body.selecting .more{display:none}
+body.selecting .check{pointer-events:none;opacity:1!important}
+body.selecting .row:not(.sel) .check{background:transparent!important;border-color:var(--faint)!important}
+body.selecting .row:not(.sel) .check::after{opacity:0!important}
+.row.sel .check{background:var(--accent)!important;border-color:var(--accent)!important}
+.row.sel .check::after{opacity:1!important}
+.row.sel .rin,.ccard.sel,.sdrow.sel{background-color:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.csel{display:none;flex:none;width:22px;height:22px;box-sizing:border-box;border-radius:50%;border:1.5px solid var(--faint);position:relative}
+body.selecting .csel{display:block}
+.sel > .csel{background:var(--accent);border-color:var(--accent)}
+.sel > .csel::after{content:"";position:absolute;left:5px;top:6px;width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg)}
+body.selecting .cctl,body.selecting .ccard .cx,body.selecting .sdrow .tbtn,body.selecting .sdrow .cx{pointer-events:none;opacity:.35}
+body.selecting .ccard{cursor:pointer}
 
 /* ---- settings sheet ---- */
 .sheet{position:fixed;inset:0;z-index:60;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;padding:0}
@@ -348,10 +380,11 @@ try{const t=localStorage.getItem('todo-tab'); if(TABS.some(x=>x.id===t))tab=t;
   draft=localStorage.getItem('todo-draft')||'';}catch(e){}
 
 const app=document.getElementById('app');
-app.innerHTML=`<div class="navbar" id="navbar" aria-hidden="true"><span id="navtitle">Work</span></div>
+app.innerHTML=`<div class="navbar" id="navbar"><span id="navtitle">Work</span><button type="button" class="navsel" id="navsel" data-seltoggle>Select</button></div>
   <header class="top">
     <div><div class="dateline"><span class="date" id="today"></span><button type="button" class="syncpill" id="syncpill" data-state="local" aria-label="Sync and settings"><i></i><span>On this device</span></button></div><h1 id="title">Work</h1></div>
     <div class="ring" id="ring" role="img"><svg viewBox="0 0 46 46"><circle class="trk" cx="23" cy="23" r="19"/><circle class="val" id="ringval" cx="23" cy="23" r="19" stroke-dasharray="119.4" stroke-dashoffset="119.4"/></svg><span id="ringtxt"></span></div>
+    <button type="button" class="selbtn" id="selbtn" data-seltoggle>Select</button>
   </header>
   <nav class="tabs" id="tabs" role="tablist"></nav>
   <div id="dumpview" hidden></div>
@@ -362,6 +395,7 @@ app.innerHTML=`<div class="navbar" id="navbar" aria-hidden="true"><span id="navt
     <div id="list"></div>
   </div>
   <footer id="status"></footer>
+  <div class="selbar" id="selbar" hidden><button type="button" id="selall">Select All</button><button type="button" id="seldone">Complete</button><button type="button" id="seldel" class="danger" disabled>Delete</button></div>
   <div class="menu" id="menu" hidden role="dialog" aria-label="Task options"></div>
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="Settings"><div class="sheet-card"></div></div>`;
 
@@ -584,6 +618,7 @@ listEl.addEventListener('focusout',e=>{const t=e.target.closest('[data-title][co
 let sw=null, swipedAt=0;
 listEl.addEventListener('pointerdown',e=>{
   if(e.pointerType==='mouse')return;
+  if(selecting)return;
   const row=e.target.closest('.row'); if(!row||row.classList.contains('later')||e.target.closest('.grip,a,[contenteditable="true"]'))return;
   sw={row,id:row.dataset.row,x:e.clientX,y:e.clientY,dx:0,active:false,pid:e.pointerId,t:performance.now(),lx:e.clientX,lt:performance.now(),v:0};
   clearTimeout(lpTimer);
@@ -681,7 +716,7 @@ function endDrag(){
   li.animate([{transform:`translateY(${from}px)`},{transform:'none'}],{duration:340,easing:'cubic-bezier(.2,1.1,.3,1)'}).finished.then(fin,fin);
 }
 listEl.addEventListener('pointerdown',e=>{
-  const g=e.target.closest('[data-grip]'); if(!g||e.button>0)return;
+  const g=e.target.closest('[data-grip]'); if(!g||e.button>0||selecting)return;
   e.preventDefault(); closeMenu(); dpend={li:g.closest('li'),pid:e.pointerId,y:e.clientY};
   try{g.setPointerCapture(e.pointerId)}catch(err){}
 });
@@ -720,7 +755,7 @@ const IC={
 const ZONES=[['1','Do first','q1',IC.bolt],['2','Schedule','q2',IC.cal],['3','Delegate','q3',IC.user],['4','Drop','q4',IC.trash],['s','Someday','qs',IC.moon]];
 function ccard(i,k){
   const filing=k==='1'||k==='2'||k==='3', Lt=i.list||dest.list;
-  return `<div class="ccard" data-card="${i.id}"><div class="cbody"><div class="ctext">${esc(i.text)}${i.repeat&&!filing?` <span class="m">↻ ${repName(i.repeat)}</span>`:''}</div>
+  return `<div class="ccard" data-card="${i.id}"><i class="csel"></i><div class="cbody"><div class="ctext">${esc(i.text)}${i.repeat&&!filing?` <span class="m">↻ ${repName(i.repeat)}</span>`:''}</div>
     ${filing?`<div class="cctl">
       <button type="button" class="pill" data-clist="${i.id}" title="Which list">${Lt==='buy'?'Things to buy':'Work'}</button>
       <select class="sm" data-crep="${i.id}" aria-label="Repeat">${REP.map(([v,n])=>`<option value="${v}"${(i.repeat||'')===v?' selected':''}>${v?'↻ '+n:'Once'}</option>`).join('')}</select>
@@ -730,7 +765,7 @@ function ccard(i,k){
     <button type="button" class="cx" data-delinbox="${i.id}" aria-label="Delete">×</button></div>`;
 }
 function tileHTML([k,n,q,ic]){const c=data.inbox.filter(i=>zoneOf(i)===k).length;
-  return `<button type="button" class="tile ${q}${k==='s'?' wide':''}" data-tile="${k}" aria-label="${n}: ${c}"><span class="ticon">${ic}</span><b class="tcount">${c}</b><span class="tname">${n}</span></button>`;}
+  return `<button type="button" class="dk ${q}" data-tile="${k}" aria-label="${n}: ${c}"><span class="dki">${ic}${c?`<b>${c}</b>`:''}</span><span class="dkl">${n}</span></button>`;}
 function renderDump(){
   const n=data.inbox.length, staged=data.inbox.filter(i=>zoneOf(i)!=='u').length, uns=n-staged;
   let h=`<section class="gsec"><div class="ghead">Capture</div>
@@ -738,7 +773,7 @@ function renderDump(){
     <p class="gfoot">End a line with <code>daily</code> or <code>weekly</code> if it repeats.</p>
     <button type="button" class="bigbtn" id="dumpadd">Add to Inbox</button></section>`;
   if(n){
-    h+=`<section class="gsec" id="board"><div class="tiles">${ZONES.map(tileHTML).join('')}</div></section>
+    h+=`<section class="gsec dockwrap" id="board"><div class="dock">${ZONES.map(tileHTML).join('')}</div></section>
     <section class="gsec"><div class="ghead">To sort${uns?` <span class="gcount">${uns}</span>`:''}<span class="ghint">Tap, or hold and drag to a box</span></div>
       <div class="group zitems" data-zone="u">${data.inbox.filter(i=>zoneOf(i)==='u').map(i=>ccard(i,'u')).join('')}<p class="zempty">All sorted</p></div></section>`;
     ZONES.forEach(([k,name,q])=>{const its=data.inbox.filter(i=>zoneOf(i)===k); if(!its.length)return;
@@ -748,7 +783,7 @@ function renderDump(){
       <p class="gfoot center">${staged?`${staged} of ${n} sorted`:'Sort items into a box first'}</p></section>`;
   }
   if(data.someday.length) h+=`<section class="gsec"><details class="group sd" id="someday"><summary>Someday <span class="gcount">${data.someday.length}</span></summary>
-     ${data.someday.map(i=>`<div class="sdrow"><span>${esc(i.text)}</span><button type="button" class="tbtn" data-revive="${i.id}">Sort again</button><button type="button" class="cx" data-delsome="${i.id}" aria-label="Delete">×</button></div>`).join('')}</details></section>`;
+     ${data.someday.map(i=>`<div class="sdrow" data-sdrow="${i.id}"><i class="csel"></i><span>${esc(i.text)}</span><button type="button" class="tbtn" data-revive="${i.id}">Sort again</button><button type="button" class="cx" data-delsome="${i.id}" aria-label="Delete">×</button></div>`).join('')}</details></section>`;
   dumpEl.innerHTML=h; updateDumpCount(); fitTA();
   setRing(staged,n);
 }
@@ -797,7 +832,7 @@ function fileAll(){
     if(cat)t.tag=addCat(cat,Lt); if(i.repeat)t.repeat=i.repeat;
     if(k==='2')t.due=i.due||todayStr(); if(k==='3'&&i.who)t.who=i.who;
     data.lists[Lt].unshift(t); moved++; });});
-  zi('s').forEach(i=>data.someday.unshift({id:i.id,text:i.text}));
+  zi('s').forEach(i=>data.someday.unshift({id:i.id,text:i.text,u:Date.now()}));
   const dropped=zi('4').length, later=zi('s').length;
   data.inbox=zi('u'); render(); queueSave();
   toast([moved&&`${moved} moved to your lists`,later&&`${later} to Someday`,dropped&&`${dropped} dropped`].filter(Boolean).join(' · '));
@@ -819,7 +854,7 @@ dumpEl.addEventListener('click',e=>{
   const tz=e.target.closest('[data-tz]'); if(tz){const it=findIn(tz.dataset.tzid); if(it){it.zone=tz.dataset.tz; if(it.zone==='2'&&!it.due)it.due=todayStr(); buzz(); render(); queueSave();} return}
   const cl=e.target.closest('[data-clist]'); if(cl){const it=findIn(cl.dataset.clist); it.list=(it.list||dest.list)==='buy'?'work':'buy'; dest={list:it.list}; store('todo-dest',JSON.stringify(dest)); render(); queueSave(); return}
   const di=e.target.closest('[data-delinbox]'); if(di){data.inbox=data.inbox.filter(i=>i.id!==di.dataset.delinbox); render(); queueSave(); return}
-  const rv=e.target.closest('[data-revive]'); if(rv){const k=data.someday.findIndex(i=>i.id===rv.dataset.revive); const it=data.someday.splice(k,1)[0]; data.inbox.push({id:it.id,text:it.text}); render(); queueSave(); toast('Back in To sort'); return}
+  const rv=e.target.closest('[data-revive]'); if(rv){const k=data.someday.findIndex(i=>i.id===rv.dataset.revive); const it=data.someday.splice(k,1)[0]; data.inbox.push({id:it.id,text:it.text,u:Date.now()}); render(); queueSave(); toast('Back in To sort'); return}
   const ds=e.target.closest('[data-delsome]'); if(ds){data.someday=data.someday.filter(i=>i.id!==ds.dataset.delsome); render(); queueSave(); const sd=$('someday'); if(sd)sd.open=true; return}
   const tl=e.target.closest('[data-tile]'); if(tl){const sec=dumpEl.querySelector(`[data-sec="${tl.dataset.tile}"]`); if(sec)sec.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); return}
   const cd=e.target.closest('.ccard'); if(cd&&!e.target.closest('input,select,button')&&Date.now()-swipedAt>400){sortSheet(cd.dataset.card); return}
@@ -827,7 +862,7 @@ dumpEl.addEventListener('click',e=>{
 /* drag cards: hold (touch) or drag (mouse); drop on a box to sort, or between rows to reorder */
 let cdrag=null, cpend=null, cLP=null;
 dumpEl.addEventListener('pointerdown',e=>{
-  const card=e.target.closest('.ccard'); if(!card||e.button>0||cdrag||drag)return;
+  const card=e.target.closest('.ccard'); if(!card||e.button>0||cdrag||drag||selecting)return;
   if(e.target.closest('input,select,button,textarea'))return;
   if(e.pointerType==='mouse'){ e.preventDefault(); cpend={card,pid:e.pointerId,x:e.clientX,y:e.clientY,mouse:true}; return; }
   cpend={card,pid:e.pointerId,x:e.clientX,y:e.clientY}; clearTimeout(cLP);
@@ -929,18 +964,54 @@ function render(){
   lastTab=tab;
   const tname=TABS.find(x=>x.id===tab).name; $('title').textContent=tname; $('navtitle').textContent=tname;
   dumpEl.hidden=!isDump; listView.hidden=isDump;
-  if(isDump){closeMenu(); renderDump(); return}
+  if(isDump){closeMenu(); renderDump(); updateSel(); return}
   input.placeholder=LISTS.find(t=>t.id===tab).ph;
-  renderSubbar(); renderList();
+  renderSubbar(); renderList(); updateSel();
 }
-function goTab(id){if(!id||id===tab)return; tab=id; store('todo-tab',tab); closeMenu(); buzz(); render();}
+function goTab(id){if(!id||id===tab)return; if(selecting){selecting=false; sel.clear(); document.body.classList.remove('selecting');} tab=id; store('todo-tab',tab); closeMenu(); buzz(); render();}
 tabsEl.addEventListener('click',e=>{const b=e.target.closest('[data-tab]'); if(!b)return; goTab(b.dataset.tab);});
+
+/* ---------- select mode: pick several, then delete or complete them together ---------- */
+let selecting=false; const sel=new Set();
+const selId=el=>el.dataset.row||el.dataset.card||el.dataset.sdrow;
+function selectable(){return [...document.querySelectorAll(tab==='dump'?'#dumpview [data-card],#dumpview [data-sdrow]':'#list [data-row]')].filter(el=>el.offsetParent!==null);}
+function setSelecting(on){selecting=on; sel.clear(); document.body.classList.toggle('selecting',on); closeMenu(); render(); buzz();}
+function updateSel(){
+  const n=sel.size, all=selectable();
+  document.querySelectorAll('[data-seltoggle]').forEach(b=>{b.textContent=selecting?'Done':'Select'; b.style.fontWeight=selecting?'600':'';});
+  $('selbar').hidden=!selecting; $('seldel').textContent=n?`Delete (${n})`:'Delete'; $('seldel').disabled=!n;
+  $('seldone').hidden=tab==='dump'; $('seldone').disabled=!n; $('selall').textContent=n&&n>=all.length?'Deselect All':'Select All';
+  document.querySelectorAll('[data-row],[data-card],[data-sdrow]').forEach(el=>el.classList.toggle('sel',sel.has(selId(el))));
+  $('navtitle').textContent=selecting&&n?`${n} Selected`:TABS.find(x=>x.id===tab).name;
+  if(selecting){const sd=$('someday'); if(sd&&[...sel].some(id=>data.someday.some(i=>i.id===id)))sd.open=true;}
+}
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-seltoggle]')){setSelecting(!selecting); return}
+  if(!selecting)return;
+  const el=e.target.closest('#list [data-row],#dumpview [data-card],#dumpview [data-sdrow]'); if(!el)return;
+  e.preventDefault(); e.stopPropagation();
+  const id=selId(el); if(sel.has(id))sel.delete(id); else sel.add(id); buzz(); updateSel();
+},true);
+$('selbar').addEventListener('click',e=>{
+  if(e.target.closest('#selall')){const all=selectable().map(selId); if(sel.size>=all.length)sel.clear(); else all.forEach(i=>sel.add(i)); updateSel(); return}
+  if(e.target.closest('#seldel')&&sel.size){const n=sel.size, ids=new Set(sel);
+    if(tab==='dump'){const ib=JSON.parse(JSON.stringify(data.inbox)), sd=JSON.parse(JSON.stringify(data.someday));
+      data.inbox=data.inbox.filter(i=>!ids.has(i.id)); data.someday=data.someday.filter(i=>!ids.has(i.id));
+      setSelecting(false); queueSave(); toast(`${n} deleted`,()=>{data.inbox=ib; data.someday=sd; queueSave(); render();});}
+    else {const undo=snapshotList(); data.lists[tab]=L().filter(i=>!ids.has(i.id)); setSelecting(false); queueSave(); toast(`${n} deleted`,undo);}
+    return}
+  if(e.target.closest('#seldone')&&sel.size&&tab!=='dump'){const undo=snapshotList(), n=sel.size, ids=new Set(sel), t=todayStr();
+    L().forEach(it=>{if(!ids.has(it.id)||it.done)return; if(it.repeat){it.due=nextDate(it.repeat,t); it.last=t;} else it.done=true;});
+    const arr=L(); data.lists[tab]=[...arr.filter(i=>!i.done),...arr.filter(i=>i.done)];
+    setSelecting(false); queueSave(); toast(`${n} completed`,undo);}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selecting)setSelecting(false);});
 
 /* swipe sideways on empty space to change tabs */
 let tsw=null;
 document.addEventListener('pointerdown',e=>{
   if(e.pointerType==='mouse'||!menu.hidden||!sheet.hidden)return;
-  if(e.target.closest('.row,.ccard,.group,.tile,textarea,input,select,.tabs,.menu,.sheet,.asheet,button,a')||document.querySelector('.asheet'))return;
+  if(e.target.closest('.row,.ccard,.group,.dk,.dock,textarea,input,select,.tabs,.menu,.sheet,.asheet,button,a')||document.querySelector('.asheet'))return;
   if(!e.target.closest('#listview,#dumpview,.top,.wrap'))return;
   tsw={x:e.clientX,y:e.clientY,pid:e.pointerId,active:false};
 },{passive:true});
@@ -986,7 +1057,13 @@ function stamp(){
   const cut=now-60*864e5; Object.keys(data.deleted).forEach(id=>{if(data.deleted[id]<cut)delete data.deleted[id]});
 }
 function writeLocal(){try{localStorage.setItem(LS_DATA,JSON.stringify(data)); localStorage.setItem(LS_META,JSON.stringify(meta));}catch(e){statusEl.textContent='Storage is full or blocked. Download a backup from Settings.';}}
-function normalize(d){d.lists=d.lists||{}; LISTS.forEach(t=>{if(!d.lists[t.id])d.lists[t.id]=[]}); d.inbox=d.inbox||[]; d.someday=d.someday||[]; d.cats=d.cats||{}; d.deleted=d.deleted||{}; return d;}
+function normalize(d){d.lists=d.lists||{}; LISTS.forEach(t=>{if(!d.lists[t.id])d.lists[t.id]=[]}); d.inbox=d.inbox||[]; d.someday=d.someday||[]; d.cats=d.cats||{}; d.deleted=d.deleted||{}; return dedupe(d);}
+/* an item lives in exactly one place: when it moved (inbox -> someday, someday -> inbox), keep only its newest copy */
+function dedupe(d){
+  const arrs=[...Object.values(d.lists),d.inbox,d.someday], best=new Map();
+  arrs.forEach(a=>a.forEach(i=>{const b=best.get(i.id); if(!b||(i.u||0)>(b.u||0))best.set(i.id,i);}));
+  const keep=a=>a.filter(i=>best.get(i.id)===i);
+  Object.keys(d.lists).forEach(k=>d.lists[k]=keep(d.lists[k])); d.inbox=keep(d.inbox); d.someday=keep(d.someday); return d;}
 function mergeArr(L,R,del){
   const lmap=new Map(L.map(i=>[i.id,i])), rmap=new Map(R.map(i=>[i.id,i])), out=[];
   const gone=i=>del[i.id]!==undefined&&del[i.id]>=(i.u||0);
@@ -1001,7 +1078,7 @@ function merge(local,remote){
   new Set([...Object.keys(local.lists),...Object.keys(remote.lists)]).forEach(k=>out.lists[k]=mergeArr(local.lists[k]||[],remote.lists[k]||[],del));
   out.inbox=mergeArr(local.inbox,remote.inbox,del); out.someday=mergeArr(local.someday,remote.someday,del);
   new Set([...Object.keys(local.cats),...Object.keys(remote.cats)]).forEach(k=>{const a=[...(local.cats[k]||[])]; (remote.cats[k]||[]).forEach(c=>{if(!a.some(x=>sameCat(x,c)))a.push(c)}); out.cats[k]=a;});
-  return out;
+  return dedupe(out);
 }
 function persist(){stamp(); meta.dirty=true; writeLocal(); setSync(syncOn&&user?'pending':syncState); }
 function queueSave(){persist(); clearTimeout(timer); if(syncOn&&user) timer=setTimeout(syncNow,1200);}
