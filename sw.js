@@ -1,6 +1,6 @@
 /* Offline support: the app's own files are cached so it opens without a connection.
    Bump VERSION whenever you upload changed files, so phones pick up the new version. */
-const VERSION = 'todo-v4';
+const VERSION = 'todo-v5';
 const SHELL = [
   './', 'index.html', 'config.js', 'manifest.webmanifest',
   'vendor/supabase.js', 'vendor/591.supabase.js',
@@ -26,7 +26,7 @@ self.addEventListener('fetch', e => {
   if (url.hostname.endsWith('supabase.co') || url.hostname.endsWith('supabase.in')) return;
 
   // Fonts: keep a copy so the app looks right offline.
-  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com' || url.hostname === 'cdn.jsdelivr.net') {
     e.respondWith(caches.open(VERSION + '-fonts').then(async c => {
       const hit = await c.match(req);
       const net = fetch(req).then(r => { if (r.ok || r.type === 'opaque') c.put(req, r.clone()); return r; }).catch(() => hit);
