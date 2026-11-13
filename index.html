@@ -172,17 +172,17 @@ body.is-dragging ul.open{overflow:visible;background:transparent}
 body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 
 /* ---- task sheet (menu): popover on desktop, sheet on phones ---- */
-.menu{position:fixed;z-index:40;width:280px;max-width:calc(100vw - 24px);background:var(--elev);border-radius:14px;box-shadow:0 20px 50px var(--shadow),0 0 0 .5px var(--line);padding:12px;display:flex;flex-direction:column;gap:8px}
-.mh{font-size:13px;letter-spacing:-.08px;text-transform:uppercase;color:var(--muted);padding:4px 4px 0}
-.mopts{display:flex;flex-wrap:wrap;gap:6px}
-.mopt{border:0;background:var(--fill);color:var(--fg);font-size:15px;letter-spacing:-.24px;padding:7px 12px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.menu{position:fixed;z-index:40;width:280px;max-width:calc(100vw - 24px);background:var(--elev);border-radius:14px;box-shadow:0 20px 50px var(--shadow),0 0 0 .5px var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
+.mh{font-size:13px;letter-spacing:-.08px;text-transform:uppercase;color:var(--muted);padding:6px 4px 0}
+.mopts{display:flex;flex-wrap:wrap;gap:8px}
+.mopt{border:0;background:var(--fill);color:var(--fg);font-size:15px;letter-spacing:-.24px;padding:10px 14px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
 .mopt .dot{width:8px;height:8px;border-radius:50%;background:var(--qc,var(--faint))}
 .mopt[aria-pressed="true"]{background:var(--accent);color:#fff}
 .mopt[aria-pressed="true"] .dot{background:#fff}
-.mfield{width:100%;box-sizing:border-box;font:inherit;font-size:17px;color:var(--fg);background:var(--fill);border:0;border-radius:10px;padding:10px 12px}
+.mfield{width:100%;box-sizing:border-box;font:inherit;font-size:17px;color:var(--fg);background:var(--fill);border:0;border-radius:10px;padding:12px 14px}
 .mfield:focus{outline:2px solid var(--accent);outline-offset:-2px}
-.msep{height:.5px;background:var(--sep);margin:4px 0}
-.mrename,.mdel,.mcancel{border:0;background:transparent;font-size:17px;text-align:left;padding:10px 4px;border-radius:9px;cursor:pointer;color:var(--accent)}
+.msep{height:.5px;background:var(--sep);margin:6px 0 2px}
+.mrename,.mdel,.mcancel{border:0;background:transparent;font-size:17px;text-align:left;padding:14px 6px;border-radius:9px;cursor:pointer;color:var(--accent)}
 .mdel{color:var(--q1)}
 .mcancel{display:none}
 .mrename:hover,.mdel:hover{background:var(--fill)}
@@ -232,7 +232,12 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .zc{margin-left:auto;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
 .zsub{font-size:13px;letter-spacing:-.08px;color:var(--muted);margin-bottom:4px}
 .zone .zitems{display:flex;flex-direction:column;gap:6px}
-.zone .ccard{background:var(--fill);border-radius:10px;padding:9px 8px 9px 12px;min-height:40px}
+.zone .ccard{background:var(--fill);border-radius:10px;padding:10px 8px 10px 4px;min-height:44px;gap:4px}
+.cgrip{flex:none;align-self:stretch;width:22px;margin:-10px 0;padding-top:14px;box-sizing:border-box;display:grid;place-items:start center;color:var(--faint);touch-action:none;cursor:grab}
+.cgrip::before{content:"";width:8px;height:14px;background-image:radial-gradient(circle,currentColor 1.3px,transparent 1.6px);background-size:4px 4.67px}
+.ccard:hover .cgrip{color:var(--muted)}
+body.selecting .cgrip{display:none}
+.ccard.ghost .cgrip{color:var(--accent)}
 .zone .ccard::before{display:none}
 .zone .ctext{font-size:15px;letter-spacing:-.24px}
 .zone .cbody{gap:6px}
@@ -307,15 +312,15 @@ details.sd[open] summary::after{transform:rotate(45deg)}
 .navl{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:0;height:44px;display:grid;place-items:center;border:0;background:transparent;color:var(--accent);padding:0;cursor:pointer}
 .navl svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 /* pull-down menu */
-.pop{position:fixed;z-index:85;min-width:240px;max-width:calc(100vw - 16px);border-radius:14px;overflow:hidden;transform-origin:top right;
+.pop{position:fixed;z-index:85;min-width:264px;max-width:calc(100vw - 16px);border-radius:14px;overflow:hidden;transform-origin:top right;
   background:color-mix(in srgb,var(--elev) 94%,transparent);backdrop-filter:saturate(1.8) blur(30px);-webkit-backdrop-filter:saturate(1.8) blur(30px);box-shadow:0 18px 50px rgba(0,0,0,.25),0 0 0 .5px var(--line)}
-.pop button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;box-sizing:border-box;border:0;background:transparent;color:var(--fg);font:inherit;font-size:17px;letter-spacing:-.41px;text-align:left;padding:0 16px;cursor:pointer}
+.pop button{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;box-sizing:border-box;border:0;background:transparent;color:var(--fg);font:inherit;font-size:17px;letter-spacing:-.41px;text-align:left;padding:0 18px;cursor:pointer}
 .pop button + button{border-top:.5px solid var(--sep)}
 .pop button:active,.pop button:hover{background:var(--fill)}
 .pop .pck{width:16px;flex:none;color:var(--accent);font-weight:600}
 .pop .pic{margin-left:auto;display:grid;place-items:center;color:var(--fg)}
 .pop .pic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.pop .phd{padding:10px 16px 4px;font-size:13px;color:var(--muted);letter-spacing:-.08px}
+.pop .phd{padding:14px 18px 6px;font-size:13px;color:var(--muted);letter-spacing:-.08px}
 .psep{height:8px;background:color-mix(in srgb,var(--fg) 6%,transparent)}
 .navbar.show{pointer-events:auto}
 .selbar{position:fixed;left:0;right:0;bottom:0;z-index:31;display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -387,9 +392,9 @@ footer{font-size:13px;color:var(--muted);text-align:center;min-height:16px}
   .tab .n{position:absolute;top:0;left:calc(50% + 6px)}
   .tab .n:not(.hot){display:none}
   .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 72px)}
-  .menu{left:8px!important;right:8px;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;border-radius:14px;padding:14px 14px 10px;gap:8px;box-shadow:0 0 0 100vmax var(--scrim)}
+  .menu{left:8px!important;right:8px;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;border-radius:16px;padding:18px 16px 12px;gap:12px;box-shadow:0 0 0 100vmax var(--scrim)}
   .menu::before{content:"";align-self:center;width:36px;height:5px;border-radius:3px;background:var(--faint);margin:-4px 0 2px}
-  .mopt{padding:9px 14px}
+  .mopt{padding:11px 16px}
   .mcancel{display:block;text-align:center;font-weight:600;background:var(--fill);margin-top:2px}
   .navbar{display:flex}
 }
@@ -837,7 +842,7 @@ const IC={
 const ZONES=[['1','Do first','q1',IC.bolt,'Urgent and important'],['2','Schedule','q2',IC.cal,'Important, can wait'],['3','Delegate','q3',IC.user,'Someone else can do it'],['4','Drop','q4',IC.trash,'Not worth doing'],['s','Someday','qs',IC.moon,'Maybe later, out of sight']];
 function ccard(i,k){
   const filing=k==='1'||k==='2'||k==='3', Lt=i.list||dest.list;
-  return `<div class="ccard" data-card="${i.id}"><i class="csel"></i><div class="cbody"><div class="ctext">${esc(i.text)}${i.repeat&&!filing?` <span class="m">↻ ${repName(i.repeat)}</span>`:''}</div>
+  return `<div class="ccard" data-card="${i.id}"><i class="csel"></i><span class="cgrip" aria-hidden="true"></span><div class="cbody"><div class="ctext">${esc(i.text)}${i.repeat&&!filing?` <span class="m">↻ ${repName(i.repeat)}</span>`:''}</div>
     ${filing?`<div class="cctl">
       <button type="button" class="pill" data-clist="${i.id}" title="Which list">${Lt==='buy'?'Things to buy':'Work'}</button>
       <select class="sm" data-crep="${i.id}" aria-label="Repeat">${REP.map(([v,n])=>`<option value="${v}"${(i.repeat||'')===v?' selected':''}>${v?'↻ '+n:'Once'}</option>`).join('')}</select>
@@ -946,7 +951,7 @@ let cdrag=null, cpend=null, cLP=null;
 dumpEl.addEventListener('pointerdown',e=>{
   const card=e.target.closest('.ccard'); if(!card||e.button>0||cdrag||drag||selecting)return;
   if(e.target.closest('input,select,button,textarea'))return;
-  if(e.pointerType==='mouse'){ e.preventDefault(); cpend={card,pid:e.pointerId,x:e.clientX,y:e.clientY,mouse:true}; return; }
+  if(e.pointerType==='mouse'||e.target.closest('.cgrip')){ e.preventDefault(); cpend={card,pid:e.pointerId,x:e.clientX,y:e.clientY,mouse:true}; return; }
   cpend={card,pid:e.pointerId,x:e.clientX,y:e.clientY}; clearTimeout(cLP);
   cLP=setTimeout(()=>{ if(cpend&&cpend.card===card){ const p=cpend; cpend=null; buzz(); startCard(p); } },350);
 });
