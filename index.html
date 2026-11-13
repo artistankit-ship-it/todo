@@ -316,7 +316,7 @@ const idx=id=>L().findIndex(i=>i.id===id);
 function metaHTML(i){
   const p=[];
   if(i.tag&&(group==='priority'||i.done)) p.push(`<span class="cat">${esc(i.tag)}</span>`);
-  if(i.due&&!i.done){const t=todayStr(); if(isLater(i)) p.push(`<span>Back ${dayLabel(i.due).toLowerCase()==='tomorrow'?'tomorrow':'on '+fmt(i.due)}</span>`);
+  if(i.due&&!i.done&&(!i.repeat||isLater(i))){const t=todayStr(); if(isLater(i)) p.push(`<span>Back ${dayLabel(i.due).toLowerCase()==='tomorrow'?'tomorrow':'on '+fmt(i.due)}</span>`);
     else if(i.due<t) p.push(`<span class="hot">Overdue · ${fmt(i.due)}</span>`); else if(i.due===t) p.push(`<span class="hot">Today</span>`); else p.push(`<span>${dayLabel(i.due)}</span>`);}
   if(i.q==3&&i.who) p.push(`<span>Waiting on ${esc(i.who)}</span>`);
   if(i.repeat) p.push(`<span>↻ ${repName(i.repeat)}</span>`);
