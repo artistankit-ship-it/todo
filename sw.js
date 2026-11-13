@@ -1,6 +1,6 @@
 /* Offline support: the app's own files are cached so it opens without a connection.
    Bump VERSION whenever you upload changed files, so phones pick up the new version. */
-const VERSION = 'todo-v7';
+const VERSION = 'todo-v8';
 const SHELL = [
   './', 'index.html', 'config.js', 'manifest.webmanifest',
   'vendor/supabase.js', 'vendor/591.supabase.js',
@@ -8,7 +8,7 @@ const SHELL = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -40,7 +40,7 @@ self.addEventListener('fetch', e => {
   // App files: answer from cache instantly, refresh the cache in the background.
   e.respondWith(caches.open(VERSION).then(async c => {
     const hit = await c.match(req, { ignoreSearch: true });
-    const net = fetch(req).then(r => { if (r.ok) c.put(req, r.clone()); return r; }).catch(() => hit || c.match('index.html'));
+    const net = fetch(req, { cache: 'no-cache' }).then(r => { if (r.ok) c.put(req, r.clone()); return r; }).catch(() => hit || c.match('index.html'));
     return hit || net;
   }));
 });
