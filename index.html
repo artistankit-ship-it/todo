@@ -320,6 +320,28 @@ details.sd[open] summary::after{transform:rotate(45deg)}
 .fab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round}
 .fab:active{transform:scale(.9)}
 body.is-dragging .fab{opacity:0;pointer-events:none}
+/* quick add: a small panel that rides on top of the keyboard */
+.qa{position:fixed;inset:0;z-index:70;background:color-mix(in srgb,#000 22%,transparent)}
+.qacard{position:fixed;left:0;right:0;bottom:var(--kb,0px);background:var(--elev);border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.qa.kb .qacard{padding-bottom:10px}
+@media (min-width:641px){.qacard{left:0;right:0;margin:0 auto;bottom:auto;top:16vh;width:520px;max-width:calc(100vw - 32px);box-sizing:border-box;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.3),0 0 0 .5px var(--line);padding:14px 16px}}
+.qaform{display:flex;align-items:center;gap:10px}
+.qaform input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:17px;letter-spacing:-.41px;color:var(--fg);padding:8px 2px;outline:none}
+.qaform input::placeholder{color:var(--faint)}
+.qago{flex:none;width:32px;height:32px;border:0;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;padding:0;cursor:pointer;transition:opacity .15s,transform .2s cubic-bezier(.2,1.5,.4,1)}
+.qago:disabled{background:var(--fill);color:var(--faint);cursor:default}
+.qago:active:not(:disabled){transform:scale(.88)}
+.qago svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.qachips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px 2px}
+.qachips::-webkit-scrollbar{display:none}
+.qc{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:16px;background:var(--fill);color:var(--fg);font:inherit;font-size:14px;letter-spacing:-.15px;padding:7px 12px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.qc .dot{width:8px;height:8px;border-radius:50%;background:var(--qc,var(--faint))}
+.qc[aria-pressed="true"]{background:color-mix(in srgb,var(--qc,var(--accent)) 18%,transparent);color:var(--qc,var(--accent));font-weight:600}
+.qc.cycle[data-on="1"]{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);font-weight:600}
+.qsep{flex:none;width:1px;background:var(--sep);margin:6px 2px}
+.qa:not([hidden]) ~ .fab{opacity:0;pointer-events:none}
+
 /* pull-down menu */
 .pop{position:fixed;z-index:85;min-width:264px;max-width:calc(100vw - 16px);border-radius:14px;overflow:hidden;transform-origin:top right;
   background:color-mix(in srgb,var(--elev) 94%,transparent);backdrop-filter:saturate(1.8) blur(30px);-webkit-backdrop-filter:saturate(1.8) blur(30px);box-shadow:0 18px 50px rgba(0,0,0,.25),0 0 0 .5px var(--line)}
@@ -456,6 +478,12 @@ app.innerHTML=`<div class="navbar" id="navbar"><button type="button" class="navl
     <div id="list"></div>
   </div>
   <footer id="status"></footer>
+  <div class="qa" id="qa" hidden>
+    <div class="qacard" id="qacard" role="dialog" aria-label="New task">
+      <form class="qaform" id="qaform"><input id="qainput" placeholder="New task" autocomplete="off" enterkeyhint="send" aria-label="New task"><button type="submit" class="qago" id="qago" aria-label="Add" disabled><svg viewBox="0 0 24 24"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></form>
+      <div class="qachips" id="qachips"></div>
+    </div>
+  </div>
   <button type="button" class="fab" id="fab" data-add aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
   <div class="selbar" id="selbar" hidden><button type="button" id="selall">Select All</button><button type="button" id="seldone">Complete</button><button type="button" id="seldel" class="danger" disabled>Delete</button></div>
   <div class="menu" id="menu" hidden role="dialog" aria-label="Task options"></div>
@@ -823,10 +851,50 @@ addEventListener('scroll',closePop,true);
 function openComposer(){
   if(selecting)setSelecting(false);
   if(tab==='dump'){const t=$('dumptext'); if(t){t.focus(); t.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'});} return}
-  const f=$('addform'), was=f.hidden; f.hidden=false; $('chint').hidden=false; input.focus();
-  if(was) anim(f,{opacity:[0,1],y:[-12,0],scale:[.97,1]},SOFT);
-  if(scroller().scrollTop>0) scroller().scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+  openQA();
 }
+/* ---------- quick add: type, tap a chip or two, send ---------- */
+const qa=$('qa'), qaIn=$('qainput'); let qaState={q:0,rep:'',cat:''};
+function qaChips(){
+  const c=cats(tab), r=REP.find(x=>x[0]===qaState.rep);
+  let h='';
+  if(tab==='work') h+=[1,2,3].map(k=>`<button type="button" class="qc ${Q[k].k}" data-qq="${k}" aria-pressed="${qaState.q===k}"><span class="dot"></span>${Q[k].name}</button>`).join('')+'<span class="qsep"></span>';
+  h+=`<button type="button" class="qc cycle" data-qrep data-on="${qaState.rep?1:0}">↻ ${qaState.rep?r[1]:'Repeat'}</button>`;
+  if(c.length) h+=`<button type="button" class="qc cycle" data-qcat data-on="${qaState.cat?1:0}"># ${esc(qaState.cat||'Category')}</button>`;
+  $('qachips').innerHTML=h;
+}
+function placeQA(){ if(qa.hidden)return; const vv=window.visualViewport; const off=vv?Math.max(0,Math.round(innerHeight-vv.height-vv.offsetTop)):0;
+  qa.style.setProperty('--kb',off+'px'); qa.classList.toggle('kb',off>40); }
+if(window.visualViewport){visualViewport.addEventListener('resize',placeQA); visualViewport.addEventListener('scroll',placeQA);}
+function openQA(){
+  closePop(); qaState={q:0,rep:'',cat:''}; qaIn.placeholder=tab==='buy'?'Something to buy':'New task'; qaIn.value=''; $('qago').disabled=true; qaChips();
+  const was=qa.hidden; qa.hidden=false; qaIn.focus(); placeQA();
+  if(was){ anim(qa,{opacity:[0,1]},{type:'tween',duration:.18}); anim($('qacard'),phone()?{y:[60,0]}:{y:[-10,0],scale:[.97,1],opacity:[0,1]},SOFT); }
+}
+function closeQA(){ if(qa.hidden)return; qaIn.blur(); anim(qa,{opacity:[1,0]},{type:'tween',duration:.16}).then(()=>{qa.hidden=true; qa.style.opacity='';}); setTimeout(()=>{qa.hidden=true; qa.style.opacity='';},260); }
+qaIn.addEventListener('input',()=>{$('qago').disabled=!qaIn.value.trim();});
+qaIn.addEventListener('keydown',e=>{if(e.key==='Escape')closeQA();});
+qa.addEventListener('click',e=>{ if(e.target===qa)closeQA(); });
+/* chips must not steal focus, or the keyboard would drop */
+$('qachips').addEventListener('pointerdown',e=>{ if(e.target.closest('.qc'))e.preventDefault(); });
+$('qago').addEventListener('pointerdown',e=>e.preventDefault());
+$('qachips').addEventListener('click',e=>{
+  const q=e.target.closest('[data-qq]'); if(q){const k=+q.dataset.qq; qaState.q=qaState.q===k?0:k; buzz(); qaChips(); return}
+  if(e.target.closest('[data-qrep]')){const i=REP.findIndex(x=>x[0]===qaState.rep); qaState.rep=REP[(i+1)%REP.length][0]; buzz(); qaChips(); return}
+  if(e.target.closest('[data-qcat]')){const c=['',...cats(tab)], i=c.findIndex(x=>sameCat(x,qaState.cat)||(!x&&!qaState.cat)); qaState.cat=c[(i+1)%c.length]; buzz(); qaChips(); return}
+});
+$('qaform').addEventListener('submit',e=>{
+  e.preventDefault(); const raw=qaIn.value.trim(); if(!raw)return;
+  let {text,cat}=parseCat(raw); const pr=parseRepeat(text||''); text=pr.text; if(!text)return;
+  cat=cat||qaState.cat; if(cat)cat=addCat(cat);
+  const it={id:uid(tab),text,done:false}; if(cat)it.tag=cat;
+  const rp=pr.repeat||qaState.rep; if(rp)it.repeat=rp;
+  if(qaState.q){it.q=qaState.q; if(qaState.q===2&&!it.due)it.due=tomorrow();}
+  L().unshift(it); qaIn.value=''; $('qago').disabled=true; render(); queueSave(); buzz();
+  const r=listEl.querySelector(`[data-row="${it.id}"]`); if(r)anim(r,{opacity:[0,1],y:[-14,0],scale:[.97,1]},SOFT);
+  anim($('qacard'),{scale:[1,1.015,1]},{type:'tween',duration:.25});
+  qaIn.focus();
+});
 function closeComposer(){ if(input.value.trim())return; $('addform').hidden=true; $('chint').hidden=true; }
 input.addEventListener('blur',()=>setTimeout(()=>{ if(document.activeElement!==input) closeComposer(); },160));
 input.addEventListener('keydown',e=>{ if(e.key==='Escape'){input.value=''; input.blur();} });
@@ -1059,7 +1127,7 @@ function render(){
   tabsEl.innerHTML=TABS.map(t=>{const n=t.id==='dump'?data.inbox.length:data.lists[t.id].filter(i=>!i.done&&!isLater(i)).length;
     return `<button type="button" class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id===tab}">${ICONS[t.id]}${t.name}<span class="n${t.id==='dump'&&n?' hot':''}${n?'':' zero'}">${n}</span></button>`}).join('');
   const isDump=tab==='dump';
-  if(lastTab!==null&&lastTab!==tab){ $('addform').hidden=true; $('chint').hidden=true; input.value='';
+  if(lastTab!==null&&lastTab!==tab){ $('addform').hidden=true; $('chint').hidden=true; input.value=''; if(!qa.hidden){qa.hidden=true;}
     const dir=TABS.findIndex(x=>x.id===tab)>TABS.findIndex(x=>x.id===lastTab)?'view-in-r':'view-in-l'; const v=isDump?dumpEl:listView;
     scroller().scrollTop=0; anim(v,{x:[dir==='view-in-r'?36:-36,0],opacity:[0,1]},SOFT);}
   lastTab=tab;
@@ -1112,7 +1180,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&selecting)setSelect
 let tsw=null;
 document.addEventListener('pointerdown',e=>{
   if(e.pointerType==='mouse'||!menu.hidden||!sheet.hidden)return;
-  if(e.target.closest('.row,.ccard,.group,.dk,.dock,textarea,input,select,.tabs,.menu,.sheet,.asheet,button,a')||document.querySelector('.asheet'))return;
+  if(e.target.closest('.row,.ccard,.group,.dk,.dock,textarea,input,select,.tabs,.menu,.sheet,.asheet,.qa,button,a')||document.querySelector('.asheet'))return;
   if(!e.target.closest('#listview,#dumpview,.top,.wrap'))return;
   tsw={x:e.clientX,y:e.clientY,pid:e.pointerId,active:false};
 },{passive:true});
