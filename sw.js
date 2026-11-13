@@ -1,6 +1,6 @@
 /* Offline support: the app's own files are cached so it opens without a connection.
    Bump VERSION whenever you upload changed files, so phones pick up the new version. */
-const VERSION = 'todo-v10';
+const VERSION = 'todo-v11';
 const SHELL = [
   './', 'index.html', 'config.js', 'manifest.webmanifest',
   'vendor/supabase.js', 'vendor/591.supabase.js',
