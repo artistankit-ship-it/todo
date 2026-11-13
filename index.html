@@ -39,7 +39,7 @@
 *{-webkit-tap-highlight-color:transparent}
 html{scrollbar-gutter:stable;touch-action:manipulation}
 html,body{overscroll-behavior:none}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.29;letter-spacing:-.41px;-webkit-font-smoothing:antialiased;
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.29;letter-spacing:-.41px;-webkit-font-smoothing:antialiased;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-top:calc(env(safe-area-inset-top,0px) + 12px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 72px)}
 [hidden]{display:none!important}
@@ -89,13 +89,18 @@ h1{font-size:34px;font-weight:700;letter-spacing:.37px;line-height:41px;margin:2
 .chint{font-size:13px;color:var(--muted);margin:-8px 16px 0;height:0;overflow:hidden;opacity:0;transition:opacity .2s}
 .composer:focus-within + .chint.on{height:auto;opacity:1}
 .chint code,.lede code,.gfoot code{font-family:var(--mono);font-size:12px;background:var(--fill);border-radius:5px;padding:1px 5px;color:var(--fg)}
-.subbar{display:flex;align-items:center;gap:12px}
+.subbar{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
 .subbar .spacer{display:none}
 .seg{display:flex;flex:1;padding:2px;background:var(--fill);border-radius:9px}
 .seg button{flex:1;white-space:nowrap;border:0;background:transparent;color:var(--fg);font-size:13px;font-weight:500;letter-spacing:-.08px;padding:6px 10px;border-radius:7px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--elev);font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
 .spacer{flex:1}
-.nudge{border:0;background:transparent;color:var(--accent);font-size:15px;font-weight:400;cursor:pointer;padding:4px 2px;white-space:nowrap}
+.nudge{order:3;flex-basis:100%;display:flex;align-items:center;gap:12px;min-height:44px;box-sizing:border-box;border:0;border-radius:10px;background:var(--surface);color:var(--fg);font:inherit;font-size:17px;letter-spacing:-.41px;text-align:left;padding:0 14px 0 12px;cursor:pointer}
+.nudge .ni{width:29px;height:29px;border-radius:7px;background:var(--accent);display:grid;place-items:center;flex:none}
+.nudge .ni svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}
+.nudge .nv{margin-left:auto;color:var(--muted)}
+.nudge::after{content:"";width:7px;height:7px;border-right:2px solid var(--faint);border-top:2px solid var(--faint);transform:rotate(45deg);margin-left:2px}
+.nudge:active{background:color-mix(in srgb,var(--fg) 7%,var(--surface))}
 
 /* ---- inset grouped lists ---- */
 #list{display:flex;flex-direction:column}
@@ -175,7 +180,7 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .mrename:hover,.mdel:hover{background:var(--fill)}
 
 /* ---- toast: iOS-style HUD capsule ---- */
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;max-width:calc(100% - 32px);
+.toast{position:fixed;left:50%;width:max-content;box-sizing:border-box;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;max-width:calc(100% - 32px);
   display:flex;align-items:center;gap:16px;padding:12px 18px;border-radius:14px;font-size:15px;font-weight:500;letter-spacing:-.24px;color:var(--fg);
   background:var(--bar);backdrop-filter:saturate(1.8) blur(24px);-webkit-backdrop-filter:saturate(1.8) blur(24px);box-shadow:0 10px 30px var(--shadow),0 0 0 .5px var(--line)}
 .toast button{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:15px;padding:0;cursor:pointer}
@@ -460,7 +465,7 @@ function setRing(done,total){
 }
 function renderSubbar(){
   const n=data.inbox.length;
-  subbar.innerHTML=`<div class="seg" role="group" aria-label="Group by"><button type="button" data-group="priority" aria-pressed="${group==='priority'}">By priority</button><button type="button" data-group="category" aria-pressed="${group==='category'}">By category</button></div><span class="spacer"></span>${n?`<button type="button" class="nudge" data-goto="dump">${n} to sort →</button>`:''}`;
+  subbar.innerHTML=`<div class="seg" role="group" aria-label="Group by"><button type="button" data-group="priority" aria-pressed="${group==='priority'}">By priority</button><button type="button" data-group="category" aria-pressed="${group==='category'}">By category</button></div><span class="spacer"></span>${n?`<button type="button" class="nudge" data-goto="dump"><span class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg></span>Brain dump<span class="nv">${n} to sort</span></button>`:''}`;
 }
 
 /* ---------- motion: springs via the Motion library, with a Web Animations fallback ---------- */
@@ -691,7 +696,7 @@ listEl.addEventListener('keydown',e=>{
 
 subbar.addEventListener('click',e=>{
   const gb=e.target.closest('[data-group]'); if(gb){group=gb.dataset.group; store('todo-group',group); render(); return}
-  const g=e.target.closest('[data-goto]'); if(g){tab=g.dataset.goto; store('todo-tab',tab); render();}
+  const g=e.target.closest('[data-goto]'); if(g){goTab(g.dataset.goto);}
 });
 $('addform').addEventListener('submit',e=>{
   e.preventDefault(); const raw=input.value.trim(); if(!raw)return;
@@ -781,7 +786,7 @@ function addDump(){
   if(!lines.length){$('dumptext').focus();return}
   lines.forEach(t=>{const pr=parseRepeat(t); const it={id:uid('in'),text:pr.text||t}; if(pr.repeat)it.repeat=pr.repeat; data.inbox.push(it);});
   draft=''; store('todo-draft','');
-  render(); queueSave(); toast(`${lines.length} added. Drag them into boxes.`);
+  render(); queueSave(); toast(`${lines.length} added to the inbox`);
   const sc=$('board'); if(sc)sc.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
 }
 function fileAll(){
