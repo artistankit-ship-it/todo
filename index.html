@@ -22,7 +22,7 @@
   --bg:#f2f2f7; --surface:#ffffff; --elev:#ffffff; --fg:#000000; --muted:rgba(60,60,67,.6); --faint:rgba(60,60,67,.3);
   --sep:rgba(60,60,67,.29); --line:rgba(60,60,67,.18); --hover:rgba(118,118,128,.12); --fill:rgba(118,118,128,.12);
   --accent:#007aff; --onaccent:#ffffff; --check:#007aff; --oncheck:#ffffff; --shadow:rgba(0,0,0,.12);
-  --green:#34c759; --q1:#ff3b30; --q2:#5856d6; --q3:#ff9500; --q4:#8e8e93; --bar:rgba(249,249,249,.82); --scrim:rgba(0,0,0,.28);
+  --green:#34c759; --q1:#ff3b30; --q2:#5856d6; --q3:#ff9500; --q4:#8e8e93; --bar:rgba(249,249,249,.82); --thumb:#ffffff; --scrim:rgba(0,0,0,.28);
   --font:-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
   --mono:ui-monospace, "SF Mono", Menlo, monospace;
 }
@@ -30,12 +30,12 @@
   --bg:#000000; --surface:#1c1c1e; --elev:#2c2c2e; --fg:#ffffff; --muted:rgba(235,235,245,.6); --faint:rgba(235,235,245,.3);
   --sep:rgba(84,84,88,.65); --line:rgba(84,84,88,.45); --hover:rgba(118,118,128,.24); --fill:rgba(118,118,128,.24);
   --accent:#0a84ff; --onaccent:#ffffff; --check:#0a84ff; --oncheck:#ffffff; --shadow:rgba(0,0,0,.5);
-  --green:#30d158; --q1:#ff453a; --q2:#5e5ce6; --q3:#ff9f0a; --q4:#8e8e93; --bar:rgba(22,22,24,.8); --scrim:rgba(0,0,0,.5); color-scheme:dark}}
+  --green:#30d158; --q1:#ff453a; --q2:#5e5ce6; --q3:#ff9f0a; --q4:#8e8e93; --bar:rgba(22,22,24,.8); --thumb:#636366; --scrim:rgba(0,0,0,.5); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#000000; --surface:#1c1c1e; --elev:#2c2c2e; --fg:#ffffff; --muted:rgba(235,235,245,.6); --faint:rgba(235,235,245,.3);
   --sep:rgba(84,84,88,.65); --line:rgba(84,84,88,.45); --hover:rgba(118,118,128,.24); --fill:rgba(118,118,128,.24);
   --accent:#0a84ff; --onaccent:#ffffff; --check:#0a84ff; --oncheck:#ffffff; --shadow:rgba(0,0,0,.5);
-  --green:#30d158; --q1:#ff453a; --q2:#5e5ce6; --q3:#ff9f0a; --q4:#8e8e93; --bar:rgba(22,22,24,.8); --scrim:rgba(0,0,0,.5); color-scheme:dark}
+  --green:#30d158; --q1:#ff453a; --q2:#5e5ce6; --q3:#ff9f0a; --q4:#8e8e93; --bar:rgba(22,22,24,.8); --thumb:#636366; --scrim:rgba(0,0,0,.5); color-scheme:dark}
 *{-webkit-tap-highlight-color:transparent}
 html{scrollbar-gutter:stable;touch-action:manipulation}
 html,body{overscroll-behavior:none}
@@ -149,6 +149,10 @@ ul.open,ul.later,ul.finished{background:var(--surface);border-radius:10px;overfl
 .row.later .title{color:var(--muted)}
 .row.later .check{opacity:.5;cursor:default}
 .empty{padding:36px 16px;text-align:center;color:var(--muted);font-size:15px}
+.empty.big{display:flex;flex-direction:column;align-items:center;gap:6px;padding:56px 24px 40px}
+.empty.big .eic{width:56px;height:56px;border-radius:16px;background:var(--surface);display:grid;place-items:center;margin-bottom:8px;color:var(--accent)}
+.empty.big .eic svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.empty.big b{font-size:17px;font-weight:600;letter-spacing:-.41px;color:var(--fg)}
 .fold{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);font-size:13px;letter-spacing:-.08px;text-transform:uppercase;padding:22px 16px 7px;cursor:pointer;width:100%;text-align:left}
 .fold .count{font-variant-numeric:tabular-nums}
 .fold::after{content:"";width:7px;height:7px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:rotate(-45deg);margin-left:auto;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
@@ -173,13 +177,14 @@ body.is-dragging ul.open{overflow:visible;background:transparent}
 body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 
 /* ---- task sheet (menu): popover on desktop, sheet on phones ---- */
-.menu{position:fixed;z-index:40;width:280px;max-width:calc(100vw - 24px);background:var(--elev);border-radius:14px;box-shadow:0 20px 50px var(--shadow),0 0 0 .5px var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
+.menu{position:fixed;z-index:40;width:320px;max-width:calc(100vw - 24px);background:var(--elev);border-radius:14px;box-shadow:0 20px 50px var(--shadow),0 0 0 .5px var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
 .mh{font-size:13px;letter-spacing:-.08px;text-transform:uppercase;color:var(--muted);padding:6px 4px 0}
-.mopts{display:flex;flex-wrap:wrap;gap:8px}
-.mopt{border:0;background:var(--fill);color:var(--fg);font-size:15px;letter-spacing:-.24px;padding:10px 14px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
-.mopt .dot{width:8px;height:8px;border-radius:50%;background:var(--qc,var(--faint))}
-.mopt[aria-pressed="true"]{background:var(--accent);color:#fff}
-.mopt[aria-pressed="true"] .dot{background:#fff}
+.mtitle{font-size:17px;font-weight:600;letter-spacing:-.41px;line-height:1.3;padding:0 4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.mopts{display:flex;padding:2px;gap:0;background:var(--fill);border-radius:9px}
+.mopt{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;border:0;background:transparent;color:var(--fg);font-size:13px;font-weight:500;letter-spacing:-.08px;padding:7px 4px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s}
+.mopt .dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--qc,var(--faint))}
+.mopt[aria-pressed="true"]{background:var(--thumb);font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
+.mopt:not([aria-pressed="true"]):hover{background:color-mix(in srgb,var(--fg) 6%,transparent)}
 .mfield{width:100%;box-sizing:border-box;font:inherit;font-size:17px;color:var(--fg);background:var(--fill);border:0;border-radius:10px;padding:12px 14px}
 .mfield:focus{outline:2px solid var(--accent);outline-offset:-2px}
 .msep{height:.5px;background:var(--sep);margin:6px 0 2px}
@@ -256,7 +261,10 @@ body.is-dragging .zdrop{color:var(--qc,var(--muted));border-color:var(--qc,var(-
 .ctext{font-size:17px;letter-spacing:-.41px;overflow-wrap:anywhere}
 .ctext .m{font-size:15px;color:var(--muted)}
 .cctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.zone .cctl .pill{padding:5px 8px}
 .sm{font:inherit;font-size:13px;color:var(--fg);background:var(--fill);border:0;border-radius:8px;padding:5px 8px;max-width:100%;min-width:0}
+select.sm{-webkit-appearance:none;appearance:none;font-weight:600;color:var(--muted);padding-right:22px;cursor:pointer;background:var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center/9px 6px}
+.zone .sm,.zone .pill{background-color:var(--surface)}
 .pill{font:inherit;font-size:13px;font-weight:600;border:0;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);border-radius:8px;padding:5px 10px;cursor:pointer}
 .cx{flex:none;position:relative;display:block;width:22px;height:22px;border:0;background:var(--fill);color:var(--muted);border-radius:50%;cursor:pointer;padding:0;font-size:0;line-height:0;overflow:visible}
 .cx::before{content:"";position:absolute;inset:-10px}
@@ -321,6 +329,7 @@ details.sd[open] summary::after{transform:rotate(45deg)}
 .fab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round}
 .fab:active{transform:scale(.9)}
 body.is-dragging .fab{opacity:0;pointer-events:none}
+body.on-dump .fab{display:none}
 /* quick add: a small panel that rides on top of the keyboard */
 .qa{position:fixed;inset:0;z-index:70;background:color-mix(in srgb,#000 22%,transparent)}
 .qacard{position:fixed;left:0;right:0;bottom:var(--kb,0px);background:var(--elev);border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);
@@ -334,7 +343,7 @@ body.is-dragging .fab{opacity:0;pointer-events:none}
 .qago:disabled{background:var(--fill);color:var(--faint);cursor:default}
 .qago:active:not(:disabled){transform:scale(.88)}
 .qago svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.qachips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px 2px}
+.qachips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 32px 2px 14px;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent)}
 .qachips::-webkit-scrollbar{display:none}
 .qc{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:16px;background:var(--fill);color:var(--fg);font:inherit;font-size:14px;letter-spacing:-.15px;padding:7px 12px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
 .qc .dot{width:8px;height:8px;border-radius:50%;background:var(--qc,var(--faint))}
@@ -594,8 +603,10 @@ function renderList(){
   listEl.innerHTML='';
   if(group==='priority'){
     const G=[['1','Do first','q1',i=>i.q==1||(i.q==2&&isDueNow(i))],['2','Scheduled','q2',i=>i.q==2&&!isDueNow(i)],['3','Delegated','q3',i=>i.q==3],['0','No priority','',i=>!i.q],['4','Maybe drop','q4',i=>i.q==4]];
+    const only=G.filter(g=>open.some(g[3])).length===1;
     G.forEach(([k,name,qk,test])=>{
       let its=open.filter(test); if(!its.length)return;
+      if(only&&k==='0'){listEl.appendChild(ul(its,'open',{pq:k}));return;}
       if(k==='2')its=its.slice().sort((a,b)=>(a.due||'9')<(b.due||'9')?-1:1);
       const key=tab+':p'+k; listEl.appendChild(sect(name,its.length,qk,'',key)); if(!isShut(key)) listEl.appendChild(ul(its,'open',{pq:k}));
     });
@@ -610,13 +621,16 @@ function renderList(){
       else{const e=document.createElement('div'); e.className='empty'; e.style.padding='6px 10px 10px'; e.style.textAlign='left'; e.textContent=`Empty. Type "task //${c}" to add one.`; listEl.appendChild(e);}
     });
   }
-  if(!open.length) {const e=document.createElement('div'); e.className='empty'; e.textContent=items.length?'All clear. Nice work.':(tab==='buy'?'Nothing to buy yet. Tap + to add something.':'Nothing here yet. Tap + to add your first task.'); listEl.prepend(e);}
+  if(!open.length){const e=document.createElement('div'); e.className='empty big';
+    const [ic,t1,t2]=items.length?['<path d="M5 12.5l4.5 4.5L19 7.5"/>','All clear','Nice work.']:tab==='buy'?['<path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>','Nothing to buy','Tap + to add something.']:['<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/>','No tasks yet','Tap + to add your first one.'];
+    e.innerHTML=`<span class="eic"><svg viewBox="0 0 24 24">${ic}</svg></span><b>${t1}</b><span>${t2}</span>`; listEl.prepend(e);}
   if(later.length) fold('later','Repeating later',later.sort((a,b)=>a.due<b.due?-1:1),'later');
   if(fin.length) fold('done','Completed',fin,'finished');
   setRing(fin.length,items.length-later.length);
 }
 function setRing(done,total){
   const f=total?done/total:0; $('ringval').style.strokeDashoffset=119.4*(1-f);
+  $('ring').style.visibility=total?'':'hidden';
   $('ringtxt').textContent=`${done}/${total}`; $('ring').setAttribute('aria-label',`${done} of ${total} done`);
 }
 function renderSubbar(){subbar.innerHTML=''; subbar.hidden=true;}
@@ -643,9 +657,9 @@ function openMenu(id){
   menuFor=id;
   let h='';
   if(it.done){
-    h=`<button type="button" class="mopt" data-mundo>Mark as not done</button><div class="msep"></div><button type="button" class="mdel" data-mdel>Delete task</button><button type="button" class="mcancel" data-mcancel>Cancel</button>`;
+    h=`<div class="mtitle">${esc(it.text)}</div><button type="button" class="mrename" data-mundo>Mark as not done</button><div class="msep"></div><button type="button" class="mdel" data-mdel>Delete task</button><button type="button" class="mcancel" data-mcancel>Cancel</button>`;
   }else{
-    h=`<div class="mh">Priority</div><div class="mopts">${[1,2,3,0].map(q=>`<button type="button" class="mopt ${q?Q[q].k:''}" data-mq="${q}" aria-pressed="${(it.q||0)==q}"><span class="dot"></span>${q?Q[q].name:'None'}</button>`).join('')}</div>`;
+    h=`<div class="mtitle">${esc(it.text)}</div><div class="mh">Priority</div><div class="mopts">${[1,2,3,0].map(q=>`<button type="button" class="mopt ${q?Q[q].k:''}" data-mq="${q}" aria-pressed="${(it.q||0)==q}"><span class="dot"></span>${q?Q[q].name.replace('Do first','Do first'):'None'}</button>`).join('')}</div>`;
     if(it.q==2) h+=`<input type="date" class="mfield" data-mdue value="${it.due||todayStr()}" aria-label="Date">`;
     if(it.q==3) h+=`<input class="mfield" data-mwho value="${esc(it.who||'')}" placeholder="Who is doing it?" aria-label="Who">`;
     h+=`<div class="mh">Repeat</div><div class="mopts">${REP.map(([v,n])=>`<button type="button" class="mopt" data-mrep="${v}" aria-pressed="${(it.repeat||'')===v}">${n}</button>`).join('')}</div>`;
@@ -1159,7 +1173,7 @@ function render(){
   $('today').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
   tabsEl.innerHTML=TABS.map(t=>{const n=t.id==='dump'?data.inbox.length:data.lists[t.id].filter(i=>!i.done&&!isLater(i)).length;
     return `<button type="button" class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id===tab}">${ICONS[t.id]}${t.name}<span class="n${t.id==='dump'&&n?' hot':''}${n?'':' zero'}">${n}</span></button>`}).join('');
-  const isDump=tab==='dump';
+  const isDump=tab==='dump'; document.body.classList.toggle('on-dump',isDump);
   if(lastTab!==null&&lastTab!==tab){ $('addform').hidden=true; $('chint').hidden=true; input.value=''; if(!qa.hidden){qa.hidden=true;}
     const dir=TABS.findIndex(x=>x.id===tab)>TABS.findIndex(x=>x.id===lastTab)?'view-in-r':'view-in-l'; const v=isDump?dumpEl:listView;
     scroller().scrollTop=0; anim(v,{x:[dir==='view-in-r'?36:-36,0],opacity:[0,1]},SOFT);}
@@ -1182,7 +1196,7 @@ function updateSel(){
   const n=sel.size, all=selectable();
   document.querySelectorAll('[data-seltoggle]').forEach(b=>b.hidden=!selecting); document.querySelectorAll('[data-moremenu],[data-add]').forEach(b=>b.hidden=selecting);
   $('selbar').hidden=!selecting; $('seldel').textContent=n?`Delete (${n})`:'Delete'; $('seldel').disabled=!n;
-  $('seldone').hidden=tab==='dump'; $('seldone').disabled=!n; $('selall').textContent=n&&n>=all.length?'Deselect All':'Select All';
+  $('seldone').hidden=tab==='dump'; $('seldone').disabled=!n; $('seldone').textContent=n?`Complete (${n})`:'Complete'; $('selall').textContent=n&&n>=all.length?'Deselect All':'Select All';
   document.querySelectorAll('[data-row],[data-card],[data-sdrow]').forEach(el=>el.classList.toggle('sel',sel.has(selId(el))));
   $('navtitle').textContent=selecting&&n?`${n} Selected`:TABS.find(x=>x.id===tab).name;
   if(selecting){const sd=$('someday'); if(sd&&[...sel].some(id=>data.someday.some(i=>i.id===id)))sd.open=true;}
