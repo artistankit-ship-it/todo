@@ -1354,7 +1354,7 @@ sheet.addEventListener('submit',async e=>{
   if(mode==='up'){
     const {data:res,error}=await sb.auth.signUp({email:em,password:pw,options:{emailRedirectTo:location.href.split('#')[0]}});
     btns.forEach(x=>x.disabled=false);
-    if(error){toast(error.message);return}
+    if(error){toast(/database error|user limit/i.test(error.message)?'Sign-ups are closed. To-do is invite-only for now.':error.message);return}
     if(res.session){user=res.user; meta.dirty=true; writeLocal(); await syncNow(); renderSheet(); toast('Account created. Sync is on.');return}
     toast('Check your email and click the confirmation link, then sign in here.'); return;
   }
