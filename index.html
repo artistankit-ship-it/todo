@@ -363,6 +363,9 @@ body.is-dragging .fab{opacity:0;pointer-events:none}
 .ipoint{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);z-index:91;transform:translateX(-50%);color:#fff;font-size:28px;animation:ibob 1.1s ease-in-out infinite;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,.5)}
 @keyframes ibob{50%{transform:translate(-50%,8px)}}
 
+/* demo: no account controls */
+.demo .syncpill{display:none}
+
 /* pull-down menu */
 .pop{position:fixed;z-index:85;min-width:264px;max-width:calc(100vw - 16px);border-radius:14px;overflow:hidden;transform-origin:top right;
   background:color-mix(in srgb,var(--elev) 94%,transparent);backdrop-filter:saturate(1.8) blur(30px);-webkit-backdrop-filter:saturate(1.8) blur(30px);box-shadow:0 18px 50px rgba(0,0,0,.25),0 0 0 .5px var(--line)}
@@ -476,6 +479,9 @@ const REP=[['','Once'],['daily','Daily'],['weekdays','Weekdays'],['weekly','Week
 const repName=r=>(REP.find(x=>x[0]===r)||['',''])[1];
 
 let tab='work', group='priority', draft='', toastT=null, openFold={}, menuFor=null, collapsed={}, prevList='work';
+/* demo mode (?demo): used when the app is embedded on a website. Fresh sample data on every load,
+   nothing read from or synced to a real account, no install prompt. */
+const DEMO=/[?&]demo\b/.test(location.search);
 let dest={list:'work'};
 try{const t=localStorage.getItem('todo-tab'); if(TABS.some(x=>x.id===t))tab=t;
   if(localStorage.getItem('todo-group')==='category')group='category';
@@ -483,6 +489,7 @@ try{const t=localStorage.getItem('todo-tab'); if(TABS.some(x=>x.id===t))tab=t;
   openFold=JSON.parse(localStorage.getItem('todo-fold')||'{}')||{};
   collapsed=JSON.parse(localStorage.getItem('todo-collapsed')||'{}')||{}; const pl=localStorage.getItem('todo-prev'); if(LISTS.some(x=>x.id===pl))prevList=pl; if(tab!=='dump')prevList=tab;
   draft=localStorage.getItem('todo-draft')||'';}catch(e){}
+if(DEMO){tab='dump'; group='priority'; draft=''; openFold={}; collapsed={}; prevList='work'; document.documentElement.classList.add('demo');}
 
 const app=document.getElementById('app');
 app.innerHTML=`<div class="navbar" id="navbar"><button type="button" class="navl" data-add aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><span id="navtitle">Work</span><button type="button" class="navr" data-moremenu aria-label="More"><svg viewBox="0 0 24 24" class="fill"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg></button><button type="button" class="navr" data-seltoggle hidden>Done</button></div>
@@ -858,8 +865,8 @@ function popMenu(anchor){
     const keys=[...listEl.querySelectorAll('[data-sect]')].map(x=>x.dataset.sect);
     if(keys.length>1){const anyOpen=keys.some(k=>!collapsed[k]); items.push('-',{label:anyOpen?'Collapse all sections':'Expand all sections',icon:'<svg viewBox="0 0 24 24"><path d="M7 9l5 5 5-5"/></svg>',act:()=>{keys.forEach(k=>{if(anyOpen)collapsed[k]=1; else delete collapsed[k];}); store('todo-collapsed',JSON.stringify(collapsed)); render();}});}
   }
-  if(!isStandalone()) items.push('-',{label:'Install app',icon:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg>',act:()=>showInstall(true)});
-  items.push('-',{label:'Sync & backup',icon:'<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9M18.5 3v4.5H14M5.5 21v-4.5H10"/></svg>',act:()=>openSheet()});
+  if(!isStandalone()&&!DEMO) items.push('-',{label:'Install app',icon:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg>',act:()=>showInstall(true)});
+  if(!DEMO) items.push('-',{label:'Sync & backup',icon:'<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9M18.5 3v4.5H14M5.5 21v-4.5H10"/></svg>',act:()=>openSheet()});
   const m=document.createElement('div'); m.className='pop'; m.setAttribute('role','menu');
   m.innerHTML=items.map((it,i)=>it==='-'?'<div class="psep"></div>':it.head?`<div class="phd">${esc(it.head)}</div>`:`<button type="button" role="menuitem" data-pi="${i}">${it.check!==undefined?`<span class="pck">${it.check?'✓':''}</span>`:''}${esc(it.label)}${it.icon?`<span class="pic">${it.icon}</span>`:''}</button>`).join('');
   document.body.appendChild(m); popEl=m;
@@ -1235,9 +1242,9 @@ menu.addEventListener('pointerup',endMenuSwipe); menu.addEventListener('pointerc
    Saved on this device first (works offline), then synced to your Supabase project.
    Each task carries a "u" timestamp of its last change, and deletions leave a short-lived
    tombstone, so edits made on two devices while offline merge instead of overwriting. */
-const LS_DATA='todo-app-data', LS_META='todo-app-sync';
+const LS_DATA=DEMO?'todo-demo-data':'todo-app-data', LS_META=DEMO?'todo-demo-sync':'todo-app-sync';
 const CFG=window.TODO_CONFIG||{};
-const syncOn=!!(CFG.supabaseUrl&&CFG.supabaseKey&&window.supabase);
+const syncOn=!DEMO&&!!(CFG.supabaseUrl&&CFG.supabaseKey&&window.supabase);
 let sb=null, user=null, meta={dirty:false,remoteAt:null}, syncing=false, syncState='local', lastErr='';
 let snap=new Map();
 try{meta=Object.assign(meta,JSON.parse(localStorage.getItem(LS_META)||'{}'))}catch(e){}
@@ -1361,6 +1368,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sheet.hidden)close
 /* start */
 (function boot(){
   let saved=null; try{saved=JSON.parse(localStorage.getItem(LS_DATA)||'null')}catch(e){}
+  if(DEMO){ const day=n=>{const d=new Date(); d.setDate(d.getDate()+n); return d.toLocaleDateString('en-CA');};
+    saved={v:2,cats:{work:['Learning']},someday:[],deleted:{},
+      inbox:[{id:'in-d1',text:'Call the bank about my card'},{id:'in-d2',text:'Book a dentist appointment'},{id:'in-d3',text:'Sketch app icon ideas'},{id:'in-d4',text:'Learn piano'},{id:'in-d5',text:'Return the library books'}],
+      lists:{work:[{id:'work-d1',text:'Finish onboarding flow review',q:1,due:day(0)},{id:'work-d2',text:'Reply to recruiter',q:1},{id:'work-d3',text:'Portfolio: new case study',q:2,due:day(1)},{id:'work-d4',text:'Practice writing',repeat:'daily'},{id:'work-d5',text:'Read design systems article',tag:'Learning'}],
+        buy:[{id:'buy-d1',text:'Running shoes'},{id:'buy-d2',text:'Coffee beans',repeat:'weekly'},{id:'buy-d3',text:'Desk lamp'}]}}; }
   data=normalize(saved||data); takeSnap(); if(!saved){writeLocal();}
   render();
   if(!syncOn){setSync('local');return}
@@ -1409,7 +1421,7 @@ function showInstall(force){
 }
 function closeInstall(){ if(!instEl)return; const m=instEl; instEl=null; anim(m,{opacity:[1,0]},{type:'tween',duration:.18}).then(()=>m.remove()); setTimeout(()=>m.remove(),400); }
 function maybeInstall(){
-  if(isStandalone())return; let later=0; try{later=+localStorage.getItem('todo-install-later')||0}catch(e){}
+  if(isStandalone()||DEMO)return; let later=0; try{later=+localStorage.getItem('todo-install-later')||0}catch(e){}
   if(Date.now()-later<3*864e5)return;   /* "Not now" quiets it for three days */
   setTimeout(()=>showInstall(false),900);
 }
